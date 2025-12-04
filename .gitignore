@@ -1,0 +1,80 @@
+# Entorno virtual
+.venv/
+venv/
+env/
+ENV/
+.env
+
+# Índices FAISS
+faiss_index/
+*.faiss
+*.pkl
+
+# Cache de Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Pytest
+.pytest_cache/
+.coverage
+htmlcov/
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+*.sublime-project
+*.sublime-workspace
+
+# Streamlit
+.streamlit/
+streamlit_cache/
+.streamlit_cache/
+
+# Archivos temporales
+*.tmp
+*.temp
+*.bak
+*.log
+
+# Archivos sensibles
+*.key
+*.pem
+secrets.json
+.env.local
+.env.*.local
+
+# Archivos del sistema
+.DS_Store
+Thumbs.db
+
+# Documentos cargados (opcional, descomentar si quieres ignorarlos)
+# *.pdf
+# uploads/
+
+# Node (si se usa para algo)
+node_modules/
+npm-debug.log
+yarn-error.log
