@@ -122,18 +122,63 @@ st.title("🤖 Chat con Documentos")
 # --- Barra Lateral ---
 with st.sidebar:
     api_key = st.text_input("Google API Key:", type="password")
-    pdf_docs = st.file_uploader("Sube tus PDFs", accept_multiple_files=True, type=['pdf'])
+    pdf_docs = st.file_uploader("Sube tus documentos (PDF, DOCX, TXT)", accept_multiple_files=True, type=['pdf','docx','txt'])
     procesar = st.button("Procesar")
 
 # --- Funciones ---
-def get_pdf_text(docs):
+def get_docs_text(docs):
+    """Extract text from uploaded documents (PDF, DOCX, TXT).
+
+    `docs` is the list returned by `st.file_uploader` (UploadedFile-like objects).
+    """
     text = ""
-    for pdf in docs:
+    for f in docs:
         try:
-            reader = PdfReader(pdf)
-            for page in reader.pages:
-                text += page.extract_text() or ""
-        except: pass
+            name = getattr(f, 'name', '') or ''
+            name = name.lower()
+            if name.endswith('.pdf'):
+                reader = PdfReader(f)
+                for page in reader.pages:
+                    text += page.extract_text() or ""
+            elif name.endswith('.docx'):
+                try:
+                    from docx import Document as DocxDocument
+                except Exception:
+                    # python-docx not installed
+                    continue
+                # f is a BytesIO; python-docx can read file-like
+                doc = DocxDocument(f)
+                for para in doc.paragraphs:
+                    text += para.text + "\n"
+            elif name.endswith('.txt') or name.endswith('.md'):
+                # Text files
+                try:
+                    b = f.read()
+                    if isinstance(b, bytes):
+                        text += b.decode('utf-8', errors='replace')
+                    else:
+                        text += str(b)
+                finally:
+                    try:
+                        f.seek(0)
+                    except Exception:
+                        pass
+            else:
+                # Unknown extension: try to read as text
+                try:
+                    b = f.read()
+                    if isinstance(b, bytes):
+                        text += b.decode('utf-8', errors='replace')
+                    else:
+                        text += str(b)
+                finally:
+                    try:
+                        f.seek(0)
+                    except Exception:
+                        pass
+        except Exception:
+            # ignore extraction errors per-file
+            continue
     return text
 
 def get_vector_store(text, key):
@@ -164,7 +209,7 @@ def get_answer(key, docs, query):
 # --- Ejecución ---
 if procesar and api_key and pdf_docs:
     with st.spinner("Procesando..."):
-        text = get_pdf_text(pdf_docs)
+        text = get_docs_text(pdf_docs)
         if text:
             get_vector_store(text, api_key)
             st.success("¡Listo!")
